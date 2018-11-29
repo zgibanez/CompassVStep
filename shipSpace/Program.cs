@@ -136,7 +136,7 @@ namespace shipSpace
 
         string GetNMEAMessage()
         {
-            //ADD ERRORS HERE
+            //ADD each of the errors value to the heading measure 
             return "$XXHDT," + HeadToDegrees(headX, headY).ToString("0.00") + ",T*1F";
         }
 

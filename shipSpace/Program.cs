@@ -21,10 +21,14 @@ namespace shipSpace
 
         static void Main(string[] args)
         {
+            //Initialize ship list
             ships = new List<Ship>();
 
+            Console.WriteLine("Welcome to the Ship application. \n " +
+                              " Type \"new\" for creating a new ship. \n" +
+                              " Type \"head ship_number headX headY\" to change a ship heading.");
+
             string command = "";
-            Console.WriteLine("Command: ");
             do
             {
                 command = Console.ReadLine();
@@ -145,6 +149,7 @@ namespace shipSpace
         {
             //Output state to console
             Console.WriteLine("I am a ship number " + ship.id + ". Heading: " + ship.headX + "," + ship.headY + ". Position: " + ship.posX + "," + ship.posY);
+            //Change physical properties
             ship.Move();
         }
 
@@ -154,7 +159,7 @@ namespace shipSpace
             posY += speed * headY;
         }
 
-        //TODO: Check if is unit vec
+        //TODO: Convert to unit vec
         static float HeadToDegrees(float headX, float headY)
         {
             return (float)Math.Atan2(headY, headX) * 180.0f / (float)Math.PI; //X axis is north in this case 

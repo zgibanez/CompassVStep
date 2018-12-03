@@ -60,3 +60,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.ide-shm
+shipSpace/.vs/shipSpace/v15/Server/sqlite3/storage.ide
+*.ide-wal

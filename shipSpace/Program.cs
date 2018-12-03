@@ -147,7 +147,30 @@ namespace shipSpace
              * c.c is the speed in knots,
              * d.d is the speed in Km/h and hh is the checksum (same rules as above). 
              * For example: $XXVTG,148.3,T,,M,1.5,N,2.8,K,S*08*/
+            double sensorSpeed, sensorHead;
+            ReadSensorOutputs(out sensorSpeed,out sensorHead);
+
             return "$XXHDT," + HeadToDegrees(headX, headY).ToString("0.00") + ",T*1F";
+        }
+
+        public void ReadSensorOutputs(out double sensorSpeed, out double sensorHead)
+        {
+            sensorSpeed = 0;
+            sensorHead = 0;
+            foreach (Sensor sensor in sensorList)
+            {
+                switch (sensor.sensorType)
+                {
+                    case (Sensor.SensorType.HEAD):
+                        sensorHead += sensor.GetSensorValue();
+                        break;
+                    case (Sensor.SensorType.VELOCITY):
+                        sensorSpeed += sensor.GetSensorValue();
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         static void SendToCompass(object state, ElapsedEventArgs e, string message, UdpSender udpS)
@@ -173,6 +196,16 @@ namespace shipSpace
         public static double HeadToDegrees(double headX, double headY)
         {
             return Math.Atan2(headY, headX) * 180.0 / Math.PI; //X axis is north in this case 
+        }
+
+        public double SpeedToKnots()
+        {
+            return speed * 1.94384;
+        }
+
+        public double SpeedToKmH()
+        {
+            return speed * 3600 / 1000;
         }
     }
 

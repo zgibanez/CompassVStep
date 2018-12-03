@@ -140,7 +140,6 @@ namespace shipSpace
 
         string GetNMEAMessage()
         {
-<<<<<<< HEAD
             //ADD each of the errors value to the heading measure 
             /*Create a speed sensor and output the speed to the compass application using the following sentence:
              * $XXVTG,a.a,T,,M,c.c,N,d.d,K,S*hh, where 
@@ -151,9 +150,6 @@ namespace shipSpace
             double sensorSpeed, sensorHead;
             ReadSensorOutputs(out sensorSpeed,out sensorHead);
 
-=======
-            //ADD ERRORS HERE
->>>>>>> parent of c318af9... Added comments
             return "$XXHDT," + HeadToDegrees(headX, headY).ToString("0.00") + ",T*1F";
         }
 

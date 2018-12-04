@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+/*Sensor class reads physical measures from the ship and distorts them by their error sources*/
 namespace shipSpace
 {
     class Sensor
@@ -22,22 +23,22 @@ namespace shipSpace
             errorList = new List<Error>();
         }
 
-        public double GetSensorValue()
+        public double GetSensorValue(double shipPropertyValue)
         {
-            double sensorValue = 0;
+            double sensorValue = shipPropertyValue;
 
-            //Get the physical property
-            switch (sensorType)
-            {
-                case SensorType.HEAD:
-                    sensorValue = Ship.HeadToDegrees(ship.headX, ship.headY);
-                    break;
-                case SensorType.VELOCITY:
-                    sensorValue = ship.speed;
-                    break;
-                default:
-                    break;
-            }
+            ////Get the physical property that its measuring
+            //switch (sensorType)
+            //{
+            //    case SensorType.HEAD:
+            //        sensorValue = Ship.HeadToDegrees(ship.headX, ship.headY);
+            //        break;
+            //    case SensorType.VELOCITY:
+            //        sensorValue = ship.speed;
+            //        break;
+            //    default:
+            //        break;
+            //}
 
             //Add the sensor errors
             foreach (Error error in errorList)

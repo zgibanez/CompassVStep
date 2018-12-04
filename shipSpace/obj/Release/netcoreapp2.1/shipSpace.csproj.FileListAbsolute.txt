@@ -1,0 +1,11 @@
+D:\Compass\CompassVStep\shipSpace\bin\Release\netcoreapp2.1\shipSpace.deps.json
+D:\Compass\CompassVStep\shipSpace\bin\Release\netcoreapp2.1\shipSpace.runtimeconfig.json
+D:\Compass\CompassVStep\shipSpace\bin\Release\netcoreapp2.1\shipSpace.runtimeconfig.dev.json
+D:\Compass\CompassVStep\shipSpace\bin\Release\netcoreapp2.1\shipSpace.dll
+D:\Compass\CompassVStep\shipSpace\bin\Release\netcoreapp2.1\shipSpace.pdb
+D:\Compass\CompassVStep\shipSpace\obj\Release\netcoreapp2.1\shipSpace.csprojAssemblyReference.cache
+D:\Compass\CompassVStep\shipSpace\obj\Release\netcoreapp2.1\shipSpace.csproj.CoreCompileInputs.cache
+D:\Compass\CompassVStep\shipSpace\obj\Release\netcoreapp2.1\shipSpace.AssemblyInfoInputs.cache
+D:\Compass\CompassVStep\shipSpace\obj\Release\netcoreapp2.1\shipSpace.AssemblyInfo.cs
+D:\Compass\CompassVStep\shipSpace\obj\Release\netcoreapp2.1\shipSpace.dll
+D:\Compass\CompassVStep\shipSpace\obj\Release\netcoreapp2.1\shipSpace.pdb

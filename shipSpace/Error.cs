@@ -9,8 +9,17 @@ namespace shipSpace
 {
     public abstract class Error
     {
-        public System.Timers.Timer timer;
-        public double value;
+        public Timer timer;
+        public double value {
+            get
+            {
+                return GetErrorValue();
+            }
+            set
+            {
+                this.value = value;
+            }
+        }
         public Stopwatch stopWatch;
 
         public virtual double GetErrorValue()

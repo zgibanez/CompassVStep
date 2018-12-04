@@ -6,9 +6,7 @@ using System.Collections.Generic;
 
 //UDP protocol
 using System.Text;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading;
+
 
 namespace shipSpace
 {
@@ -95,11 +93,12 @@ namespace shipSpace
 
         //Physical variables
         int id;
-        public float headX, headY;
-        float posX, posY;
-        float speed;
+        public double headX, headY;
+        public double speed;
+        double posX, posY;
 
         //TODO: Add a sensor class. Within the sensor class add a list of errors.
+        private List<Sensor> sensorList;
         
         public Ship(int id, int port)
         {
@@ -110,13 +109,18 @@ namespace shipSpace
 
             //Head and position initialized randomly
             Random r = new Random();
-            this.headX = (float)r.NextDouble() * 2 - 1;
-            this.headY = (float)r.NextDouble() * 2 - 1;
+            this.headX = r.NextDouble() * 2 - 1;
+            this.headY = r.NextDouble() * 2 - 1;
             this.speed = 1;
 
-            this.posX = (float)r.NextDouble() * 1000 - 1000;
-            this.posY = (float)r.NextDouble() * 1000 - 1000;
+            this.posX = r.NextDouble() * 1000 - 1000;
+            this.posY = r.NextDouble() * 1000 - 1000;
             Console.WriteLine("Created ship number " + id + " with port " + port + ". Initial heading " + headX + "," + headY + ". Initial position: " + posX + "," + posY);
+
+            //Start ship sensors. By default we add one for heading and one for velocity
+            sensorList = new List<Sensor>();
+            sensorList.Add(new Sensor(this, Sensor.SensorType.HEAD));
+            sensorList.Add(new Sensor(this, Sensor.SensorType.VELOCITY));
 
             //Start ship movement thread
             System.Timers.Timer timer1 = new System.Timers.Timer();
@@ -137,7 +141,36 @@ namespace shipSpace
         string GetNMEAMessage()
         {
             //ADD each of the errors value to the heading measure 
+            /*Create a speed sensor and output the speed to the compass application using the following sentence:
+             * $XXVTG,a.a,T,,M,c.c,N,d.d,K,S*hh, where 
+             * a.a is the heading in decimal degrees from North, 
+             * c.c is the speed in knots,
+             * d.d is the speed in Km/h and hh is the checksum (same rules as above). 
+             * For example: $XXVTG,148.3,T,,M,1.5,N,2.8,K,S*08*/
+            double sensorSpeed, sensorHead;
+            ReadSensorOutputs(out sensorSpeed,out sensorHead);
+
             return "$XXHDT," + HeadToDegrees(headX, headY).ToString("0.00") + ",T*1F";
+        }
+
+        public void ReadSensorOutputs(out double sensorSpeed, out double sensorHead)
+        {
+            sensorSpeed = 0;
+            sensorHead = 0;
+            foreach (Sensor sensor in sensorList)
+            {
+                switch (sensor.sensorType)
+                {
+                    case (Sensor.SensorType.HEAD):
+                        sensorHead += sensor.GetSensorValue();
+                        break;
+                    case (Sensor.SensorType.VELOCITY):
+                        sensorSpeed += sensor.GetSensorValue();
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         static void SendToCompass(object state, ElapsedEventArgs e, string message, UdpSender udpS)
@@ -160,108 +193,22 @@ namespace shipSpace
         }
 
         //TODO: Convert to unit vec
-        static float HeadToDegrees(float headX, float headY)
+        public static double HeadToDegrees(double headX, double headY)
         {
-            return (float)Math.Atan2(headY, headX) * 180.0f / (float)Math.PI; //X axis is north in this case 
+            return Math.Atan2(headY, headX) * 180.0 / Math.PI; //X axis is north in this case 
+        }
+
+        public double SpeedToKnots()
+        {
+            return speed * 1.94384;
+        }
+
+        public double SpeedToKmH()
+        {
+            return speed * 3600 / 1000;
         }
     }
 
-    //This implementation is not mine!
-    public class UdpSender
-    {
-        private string IP;
-        public int port;
 
-        IPEndPoint remoteEndPoint;
-        UdpClient client;
 
-        public UdpSender(int port)
-        {
-            IP = "127.0.0.1";
-            this.port = port;
-
-            remoteEndPoint = new IPEndPoint(IPAddress.Parse(IP), port);
-            client = new UdpClient();
-        }
-
-        public void sendString(string message)
-        {
-            try
-            {
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                client.Send(data, data.Length, remoteEndPoint);
-                Console.WriteLine("Sending message: " + message);
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine(err.ToString());
-            }
-        }
-    }
-
-    //
-    public abstract class Error
-    {
-        public System.Timers.Timer timer;
-        public float value;
-
-        public void InitializeTimer(double interval = 1000)
-        {
-            timer = new System.Timers.Timer();
-            timer.Interval = interval;
-            timer.Elapsed += new ElapsedEventHandler(UpdateValue);
-            timer.AutoReset = true;
-            timer.Enabled = true;
-        }
-        public virtual void UpdateValue(object source, ElapsedEventArgs e)
-        {
-            return;
-        }
-    }
-
-    public class EOffset : Error
-    {
-        public EOffset(float value)
-        {
-            this.value = value;
-        }
-    }
-
-    public class EDrift : Error
-    {
-        float drift;
-
-        public EDrift(float drift)
-        {
-            //Error starts with 0, then begins drifting
-            this.value = 0;
-            this.drift = drift;
-            InitializeTimer();
-        }
-
-        public override void UpdateValue(object source, ElapsedEventArgs e)
-        {
-            value += drift; 
-        }
-    }
-
-    public class EFreq : Error
-    {
-        float frequency, amplitude, offset, time;
-
-        public EFreq(float frequency, float amplitude, float offset)
-        {
-            this.frequency = frequency;
-            this.amplitude = amplitude;
-            this.offset = offset;
-            time = 0;
-            InitializeTimer(100);
-        }
-
-        public override void UpdateValue(object source, ElapsedEventArgs e)
-        {
-            value = amplitude * (float) Math.Sin((double)(frequency * time)) + offset;
-            time += (float)timer.Interval; 
-        }
-    }
 }
